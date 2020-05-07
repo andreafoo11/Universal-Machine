@@ -1,0 +1,4 @@
+***** Writing test 'halt'.
+***** Writing test 'halt-verbose'.
+***** Writing test 'add'.
+***** Writing test 'print-six'.

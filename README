@@ -1,0 +1,153 @@
+README
+COMP40
+HW6: um
+Names: Isabelle Lai(ilai01) and Andrea Foo (afoo01)
+Due: April 13, 2020
+
+TAs: Adam, Michael, Alex, Danielle, James
+(Big thank you!)
+
+To our knowledge, we believe all the files required for submission have been 
+correctly implemented.
+
+Differences from design:
+To our knowledge, we believe that we have implemented most things according to
+our design plan.  
+
+Architecture:
+Our main module will call the functions from the other modules in order to 
+perform the correct instructions (arithmetic, memory management, etc.). During 
+setup, the main module will call map segment to map segment 0. The main module
+will pass pointers to the data structures representing the registers and main
+memory into each function as needed. 
+
+The data structures used in this assignment were Hanson Data structures. We 
+used a Sequence for the main memory, a stack to store the unmapped segment
+ids that we popped if not empty when mapping a new segment and pushed when
+unmapping a segment. We used a UArray_T of type uint32_t and size 8 to store
+our registers. Our program is a uint32_t that we incremented every time 
+an instruction is performed or updated whenever load program is called. 
+
+1. Our main driver is main.c, which calls the run_program() function in um.c. 
+
+2. um.c sets up segment zero by loading in instruction words and executes
+the program by looping through and performing every instruction, incrementing
+the program counter each time. It uses bitpack (from solutions) to unpack a 
+given instruction  word and get the index of registers and opcode for the 
+instruction word. The  instructions executed call functions  from other modules
+based on the type of instruction. This module also held the halt instruction
+function that will be called if the halt instruction was called. 
+
+3. mem_instructions module: Holds all the memory instruction functions (ie 
+segmented_store, segmented_load, map, unmap, and load_program)
+   
+4. arith_instructions module: Holds all the arithmetic and logical operations
+instructions (ie add, divide, multiply, load value, bitwise_NAND, and 
+conditional move)
+   
+5. io_instructions module: Holds the two functions, read input and output, that
+will either read in a byte from stdin or output a byte to stdout. 
+
+Our solution is modular because we packaged functions based on the type of
+instructions performed. Mem_instructions, arith_instructions, and 
+io_instructions are independent of each other and um.c is the only module
+that has access to all three modules. 
+
+50 million instructions time:
+To calculate this, we timed our um by running it on midmark.um. The 
+lab spec document for the UM unit testing lab specified that midmark.um 
+performed around 80 million instructions. Our um ran midmark.um in 
+approximately 10 seconds, so we multiplied this time by 5/8ths, calculating
+that our um would perform 50 million instructions in around 6.25 seconds. 
+
+
+
+UM Unit tests:
+halt.um:
+    Tests halt instruction by performing halt instruction to ensure machine 
+    halts.
+halt-verbose.um:
+    Tests halt instruction by performing various other operations, then 
+    performing halt instruction to ensure machine halts and all memory 
+    resources are freed once machine halts. 
+output.um
+    Tests output instruction by loading value 54 into register 1 and 
+    outputting contents of that register to ensure output matches expected
+    output of '6', the character represented by the ascii value of 54.
+add.um
+    Tests add instruction by loading two values into two registers, performing 
+    the add instruction on those two registers, and printing out the contents 
+    of the register storing the sum to ensure it matches the expected output. 
+multiply.um
+    Tests multiply instruction by loading two values into two registers, 
+    performing the multiply instruction on those two registers, and printing 
+    out the contents of the register storing the product to ensure it 
+    matches the expected output.
+multiply-edge1.um
+    Tests an edge case of the multiply instruction by loading 0 into one 
+    register and a nonzero value into another register. Performs multiply 
+    instruction on those two registers and outputs the contents of the 
+    register storing the product to ensure the product is 0 as expected. 
+divide.um
+    Tests divide instruction by loading two values into two registers, 
+    performing the divide instruction on those two registers, and printing 
+    out the contents of the register storing the product to ensure it 
+    matches the expected output.
+divide-edge2.um
+    Tests an edge case of the divide instruction by loading 0 into one 
+    register and a nonzero value into another register. Performs divide 
+    instruction and having 0 divide a number, which is expected
+    to output NULL. 
+cmov.um
+    Tests conditional move instruction by loading a nonzero value into one
+    register and performing the conditional move instruction with that
+    register as register C. Prints out the contents of register A to
+    ensure that a move was performed and the output matches
+    the expected output. 
+cmov-edge1.um
+    Tests conditional move instruction by loading 0 into one
+    register and performing the conditional move instruction with that
+    register as register C. Prints out the contents of register A to
+    ensure that no move was performed and the output matches
+    the expected output. 
+bitwise-nand.um
+    Tests bitwise NAND instruction. Loads 0 into two registers and performs 
+    bitwise NAND on those two registers, storing result in register 1. Then 
+    performs conditional move instruction with register 1 as register C.
+    Prints out contents of register A after conditional move to ensure
+    a move was performed. Since result of bitwise NAND should not have been 0,
+    the conditional move should be performed. 
+input.um
+    Tests taking in user input by loading the input character into a register
+    and outputting it to make sure that output matches user input. 
+input-2.um
+    Tests taking in user input by loading the input character into a register
+    and adding that value to another value loaded into another register, saving
+    this new value, and then outputting the value. Makes sure that the 
+    output from the input matches expected output. 
+map-segment.um
+    Tests map segment by mapping a segment and making sure there are no 
+    segfaults or memory leaks after halt instruction is executed. 
+unmap-segment.um
+    Tests unmap segment by mapping a segment and then unmapping it to make 
+    sure there are no segfaults or memory leaks after halt instruction is 
+    executed. 
+segmented-store.um
+    Tests segmented-store by mapping a segment, stores a value into the segment
+    we mapped and ensures that machine does not fail or seg fault. 
+segmented-load.um
+    Tests segmented load instruction by mapping several segments, storing a 
+    value into one of those segments, then loading that stored value back 
+    into a register using a segmented load instruction. Outputs the content of
+    that register to ensure store and load were performed correctly. 
+load-program.um
+    Tests load-program by first mapping a segment, and copying a load-value, 
+    output, and halt instruction word into that segment. Then loads program 
+    using that segment to replace segment 0. Once the new segment is loaded
+    as segment 0, we know the load program instruction was successful if then
+    load-value, output, and halt instructions that we copied into the 
+    segment earlier are performed correctly. 
+
+Hours spent analyzing: 2 Hours
+Hours spent preparing our design: 4 hours
+Hours spend solving problems: 18 hours
